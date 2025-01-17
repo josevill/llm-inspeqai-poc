@@ -81,6 +81,10 @@ Word Count Range: 1200~1800 words"""
     print_evaluation_results("Prompt Evaluation", result["prompt_evaluation"])
     print_evaluation_results("Response Evaluation", result["response_evaluation"])
 
+    print(
+        f"Response Evaluation Status: {'Failed' if result.get('failed_metrics', False) else 'Passed'}"
+    )
+
 
 if __name__ == "__main__":
     main()
