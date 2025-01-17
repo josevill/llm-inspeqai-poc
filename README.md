@@ -11,7 +11,7 @@ This project provides a Python interface to interact with Claude AI for content 
 
 ## Prerequisites
 
-- Python 3.12 or higher, certain libraries may require a more recent version. This PoC was built with Python 3.11.
+- Python 3.12, the packages under the requirements.txt file may be compatible with older versions of Python.
 - [Anthropic API](https://docs.anthropic.com/)
 - [Anthropic API Key](https://console.anthropic.com/)
 - [InspeqAI API Key and Project ID](https://inspeq.ai/)
