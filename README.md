@@ -36,7 +36,7 @@ This project provides a Python interface to interact with Claude AI for content 
    pip install -r requirements.txt
    ```
 
-4. Create a `.env` file in the project root:
+4. Create a copy of `.env.example` as `.env` file in the project root and fill it with your credentials:
    ```env
    CLAUDE_API_KEY=your_claude_api_key
    INSPEQ_API_KEY=your_inspeq_api_key
