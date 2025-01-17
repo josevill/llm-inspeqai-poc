@@ -1,4 +1,4 @@
-# AI Content Generation and Evaluation Project
+# Inspeq AI & Anthropic PoC (local)
 
 This project provides a Python interface to interact with Claude AI for content generation and InspeqAI for content evaluation. It includes a complete workflow for evaluating prompts, generating content, and evaluating responses.
 
