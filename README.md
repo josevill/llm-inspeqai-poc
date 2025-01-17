@@ -50,6 +50,54 @@ This project provides a Python interface to interact with Claude AI for content 
 ```bash
 python src/main.py
 ```
+### In case of wanting to use Bedrock instead of Anthropic's API directly
+You can make the following change to the ai_client.py file:
+```python
+from anthropic import AnthropicBedrock
+
+client = AnthropicBedrock()
+
+# Line 1:
+# From this:
+from anthropic import Anthropic
+# To this:
+from anthropic import AnthropicBedrock
+
+------
+
+# Line 45:
+# From this
+self.claude_client = Anthropic(api_key=os.getenv("CLAUDE_API_KEY"))
+# To this:
+self.claude_client = AnthropicBedrock()
+# You can also do this:
+self.claude_client = AnthropicBedrock(
+  aws_profile='...', # Only if profiles are already configured for your account under ~/.aws
+  aws_region='...',
+  aws_secret_key='...',
+  aws_access_key='...',
+  aws_session_token='...', # Optional, only needed for temporary credentials
+)
+------
+
+# Line 76:
+# From this
+message = self.claude_client.messages.create(
+    model="claude-3-5-sonnet-latest",
+    max_tokens=1500,
+    messages=[{"role": "user", "content": payload}],
+)
+
+# To this:
+message = self.claude_client.messages.create(
+    model="anthropic.claude-3-5-sonnet-20241022-v2:0",
+    max_tokens=1500,
+    messages=[{"role": "user", "content": payload}],
+)
+
+
+```
+Bear in mind that you will have to have credentials already configured for an AWS Account in your desired region where Bedrock is enabled and the Sonnet Model is available.
 
 ### Modifying the Prompt and Context
 
