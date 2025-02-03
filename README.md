@@ -82,8 +82,6 @@ step_function_arn = (
 If you are using a different region, you will need to change the region to the one you are using as well.
 Keep in mind that the Step Function State Machine role needs access to all these Lambdas, which can lead to permission issues, make the necessary arrangements to the Policy being created once the State Machine is created so you don't run into these issues.
 
-
-```
 ### Running the Project (Local)
 
 ```bash
