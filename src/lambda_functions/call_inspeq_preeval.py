@@ -2,8 +2,8 @@ import os
 from inspeq.client import InspeqEval
 
 # Initialize the client
-INSPEQ_API_KEY = os.environ.get("INSPEQA")
-INSPEQ_PROJECT_ID = os.environ.get("INSPEQB")
+INSPEQ_API_KEY = os.environ.get("INSPEQAPI")
+INSPEQ_PROJECT_ID = os.environ.get("INSPEQPROJECT")
 
 inspeq_eval = InspeqEval(
     inspeq_api_key=INSPEQ_API_KEY, inspeq_project_id=INSPEQ_PROJECT_ID

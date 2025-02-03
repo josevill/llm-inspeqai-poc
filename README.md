@@ -45,7 +45,43 @@ This project provides a Python interface to interact with Claude AI for content 
 
 ## Usage
 
-### Running the Project
+### Running the Project (AWS)
+Create the functions as per all the functions provided under `src/lambda_functions/`
+You will need all necesarry permissions to run the functions as they call on Bedrocks API and will most likely need to read and write logs to CloudWatch, the default role created by the Lambda API will suffice yet for Bedrock given certain scenario, you will need to call the Guardrails endpoint and the Invoke endpoint for Bedrock.
+
+Your mileage might vary, yet the following policy should suffice for this end:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "BedrockAll",
+            "Effect": "Allow",
+            "Action": [
+                "bedrock:InvokeModel",
+                "bedrock:createGuardrail",
+                "bedrock:CreateGuardrailVersion",
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+
+You will also need to create two environment variables into your lambdas, INSPEQAPI and INSPEQPROJECT.
+Which you can define in the configuration panel under the Lambda Functions call_inspeq_*.
+Keep in mind that given the nature of this workload, you will also need to increase the Timeout periods for your lambdas that interact with Bedrock for Inference as generation of content can take some time, several trials led to have a sweet spot around a minute and minute and a half of timeout span for your functions to generate the content, so feel free to modify the time for those.
+
+Once everything is in place, go to the main folder in your environment and run your API to interface with your step function state machine.
+You will need to configure the state machine ARN in your code `src/api.py`:
+```python
+step_function_arn = (
+    "arn:aws:states:us-east-1:<account-id>:stateMachine:state_machine_name"
+)
+```
+If you are using a different region, you will need to change the region to the one you are using as well.
+
+```
+### Running the Project (Local)
 
 ```bash
 python src/main.py

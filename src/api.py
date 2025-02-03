@@ -9,13 +9,6 @@ app = FastAPI(title="Blog Generator API")
 ai_client = AIClient()
 
 
-class BlogRequest(BaseModel):
-    prompt: str
-    context: str | None = None
-    prompt_metrics: list | None = None
-    response_metrics: list | None = None
-
-
 class InvokeRequest(BaseModel):
     prompt: str
     context: str | None = None
@@ -23,7 +16,7 @@ class InvokeRequest(BaseModel):
 
 client = boto3.client("stepfunctions")
 step_function_arn = (
-    "arn:aws:states:us-east-1:XXXXXXXXXXXX:stateMachine:MyStateMachine-obrluyueo"
+    "arn:aws:states:us-east-1:<account-id>:stateMachine:state_machine_name"
 )
 
 
@@ -69,42 +62,6 @@ async def invoke(request: InvokeRequest):
             stateMachineArn=step_function_arn, input=json.dumps(payload)
         )
         return {"status": "success", "execution_arn": response["executionArn"]}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/generate")
-async def generate_blog(request: BlogRequest):
-    try:
-        result = ai_client.complete_evaluation_flow(
-            prompt=request.prompt,
-            context=request.context,
-            prompt_metrics=request.prompt_metrics,
-            response_metrics=request.response_metrics,
-        )
-        return {"status": "success", "data": result}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/evaluate-prompt")
-async def evaluate_prompt(request: BlogRequest):
-    try:
-        result = ai_client.evaluate_prompt(
-            prompt=request.prompt,
-            context=request.context,
-            metrics=request.prompt_metrics,
-        )
-        return {"status": "success", "data": result}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/generate-content")
-async def generate_content(request: BlogRequest):
-    try:
-        result = ai_client.ask_claude(prompt=request.prompt, context=request.context)
-        return {"status": "success", "data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
