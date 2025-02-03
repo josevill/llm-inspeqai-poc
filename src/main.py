@@ -50,18 +50,11 @@ Word Count Range: 1200~1800 words"""
 
     prompt_metrics = [
         "DATA_LEAKAGE",
-        "INSECURE_OUTPUT",
-        "COHERENCE",
-        "GRAMMATICAL_CORRECTNESS",
-        "TOXICITY",
     ]
 
     response_metrics = [
-        "RESPONSE_TONE",
         "ANSWER_RELEVANCE",
         "FACTUAL_CONSISTENCY",
-        "READABILITY",
-        "CLARITY",
     ]
 
     result = client.complete_evaluation_flow(

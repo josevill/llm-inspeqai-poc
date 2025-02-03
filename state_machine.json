@@ -1,0 +1,108 @@
+{
+  "Comment": "State machine for handling inspeq evaluations",
+  "StartAt": "call_inspeq_preeval",
+  "States": {
+    "call_inspeq_preeval": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:XXXXXXXXXXXX:function:call_inspeq_preeval:$LATEST",
+        "Payload.$": "$"
+      },
+      "Next": "check_pre_eval_response"
+    },
+    "check_pre_eval_response": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.Payload.body.passed",
+              "BooleanEquals": true
+            },
+            {
+              "Variable": "$.Payload.statusCode",
+              "NumericEquals": 200
+            }
+          ],
+          "Next": "call_bedrock"
+        },
+        {
+          "Or": [
+            {
+              "Variable": "$.Payload.statusCode",
+              "NumericGreaterThan": 200
+            },
+            {
+              "Variable": "$.Payload.statusCode",
+              "NumericLessThan": 200
+            }
+          ],
+          "Next": "send_alert_to_system"
+        }
+      ],
+      "Default": "call_bedrock_guardrails"
+    },
+    "call_bedrock_guardrails": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:XXXXXXXXXXXX:function:call_guardrails:$LATEST",
+        "Payload": {
+          "prompt.$": "$.Payload.body.results[0].prompt",
+          "context.$": "$.Payload.body.results[0].context",
+          "evaluation": {
+            "status.$": "$.Payload.statusCode",
+            "results.$": "$.Payload.body.results"
+          }
+        }
+      },
+      "Next": "call_bedrock"
+    },
+    "call_bedrock": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:XXXXXXXXXXXX:function:call_bedrock:$LATEST",
+        "Payload": {
+          "prompt.$": "$.Payload.body.prompt",
+          "context.$": "$.Payload.body.context",
+          "evaluation": {
+            "status.$": "$.Payload.statusCode",
+            "results.$": "$.Payload.body.results"
+          }
+        }
+      },
+      "Next": "call_inspeq_whole_payload"
+    },
+    "call_inspeq_whole_payload": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:us-east-1:XXXXXXXXXXXX:function:call_inspeq_llm_evaluation:$LATEST",
+        "Payload": {
+          "prompt.$": "$.Payload.body.prompt",
+          "context.$": "$.Payload.body.context",
+          "llm_response.$": "$.Payload.body.llm_response",
+          "evaluation": {
+            "status.$": "$.Payload.statusCode",
+            "results.$": "$.Payload.body.results"
+          }
+        }
+      },
+      "End": true
+    },
+    "send_alert_to_system": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:us-east-1:XXXXXXXXXXXX:generation_failed",
+        "Message": {
+          "error": "Evaluation failed",
+          "details.$": "$.parsed"
+        }
+      },
+      "End": true
+    }
+  }
+}
