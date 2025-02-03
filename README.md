@@ -1,4 +1,4 @@
-# Inspeq AI & Anthropic PoC (local)
+# Inspeq AI & Anthropic PoC (AWS Step Functions & Local)
 
 This project provides a Python interface to interact with Claude AI for content generation and InspeqAI for content evaluation. It includes a complete workflow for evaluating prompts, generating content, and evaluating responses.
 
@@ -49,7 +49,7 @@ This project provides a Python interface to interact with Claude AI for content 
 Create the functions as per all the functions provided under `src/lambda_functions/`
 You will need all necesarry permissions to run the functions as they call on Bedrocks API and will most likely need to read and write logs to CloudWatch, the default role created by the Lambda API will suffice yet for Bedrock given certain scenario, you will need to call the Guardrails endpoint and the Invoke endpoint for Bedrock.
 
-Your mileage might vary, yet the following policy should suffice for this end:
+Your mileage might vary, yet attaching the following policy should suffice for this end, it needs to be attached to the role created by the Lambda API:
 ```json
 {
     "Version": "2012-10-17",
@@ -66,6 +66,7 @@ Your mileage might vary, yet the following policy should suffice for this end:
         }
     ]
 }
+```
 
 You will also need to create two environment variables into your lambdas, INSPEQAPI and INSPEQPROJECT.
 Which you can define in the configuration panel under the Lambda Functions call_inspeq_*.
@@ -79,6 +80,8 @@ step_function_arn = (
 )
 ```
 If you are using a different region, you will need to change the region to the one you are using as well.
+Keep in mind that the Step Function State Machine role needs access to all these Lambdas, which can lead to permission issues, make the necessary arrangements to the Policy being created once the State Machine is created so you don't run into these issues.
+
 
 ```
 ### Running the Project (Local)
