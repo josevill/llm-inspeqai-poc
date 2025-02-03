@@ -70,6 +70,21 @@ Your mileage might vary, yet attaching the following policy should suffice for t
 
 You will also need to create two environment variables into your lambdas, INSPEQAPI and INSPEQPROJECT.
 Which you can define in the configuration panel under the Lambda Functions call_inspeq_*.
+
+For the Layer that you will need to leverage the InspeqAI SDK, you will need to create a zip file containing the SDK, which you can find [here](https://github.com/inspeqai/inspeqai-py-sdk).
+
+To create the ZIP file you can use the below commands:
+```bash
+# Create the necessary folder structure for Lambda Function Layers for Python
+mkdir -p layers/python
+# Install the dependencies with PIP for Python3 into the directory layers/python
+pip3 install inspeqai -t layers/python
+cd layers
+# Create the zip file including all the dependencies
+zip -r ../inspeq_layer.zip .
+```
+The output file is what you will want to upload to your Lambda environment as a Layer. [AWS Docs on Creating Layers](https://docs.aws.amazon.com/lambda/latest/dg/creating-deleting-layers.html)
+
 Keep in mind that given the nature of this workload, you will also need to increase the Timeout periods for your lambdas that interact with Bedrock for Inference as generation of content can take some time, several trials led to have a sweet spot around a minute and minute and a half of timeout span for your functions to generate the content, so feel free to modify the time for those.
 
 Once everything is in place, go to the main folder in your environment and run your API to interface with your step function state machine.
@@ -80,7 +95,20 @@ step_function_arn = (
 )
 ```
 If you are using a different region, you will need to change the region to the one you are using as well.
-Keep in mind that the Step Function State Machine role needs access to all these Lambdas, which can lead to permission issues, make the necessary arrangements to the Policy being created once the State Machine is created so you don't run into these issues.
+Additionally, the State Machine role needs access to all these Lambdas, which can lead to permission issues, make the necessary arrangements to the Policy being created once the State Machine is created so you don't run into these issues.
+
+Once done with all the steps, you can run the local API running against your state machine with:
+```python
+python src/api.py
+```
+
+Provided in the project under `example-call.md` is an example of how to call the API with Curl.
+Should you not have AWS Credentials present in your environment, you will need to provide them as environment variables, the following command will suffice for you to configure your environment:
+```bash
+aws configure
+```
+
+Once available, run your API, if you had it already running, you will need to restart it as the AWS Client (boto3) can have unexpected behaviour due to the environment variables change.
 
 ### Running the Project (Local)
 
